@@ -19,11 +19,11 @@ function setStatus(online, aiAvailable) {
     if (!statusEl) return;
 
     if (!online) {
-        statusEl.textContent = "🔴 Offline";
+        statusEl.textContent = "Offline";
         return;
     }
 
-    statusEl.textContent = aiAvailable ? "🟢 Online · 🧠 AI Ready" : "🟢 Online · 🧠 Basic Mode";
+    statusEl.textContent = aiAvailable ? "Online · AI ready" : "Online · Basic mode";
 }
 
 startup();
@@ -103,6 +103,11 @@ closeSettingsBtn.addEventListener("click", () => {
     settingsModal.classList.add("hidden");
 });
 
+const closeSettingsIconBtn = document.getElementById("closeSettingsIconBtn");
+closeSettingsIconBtn.addEventListener("click", () => {
+    settingsModal.classList.add("hidden");
+});
+
 settingsModal.addEventListener("click", (e) => {
     if (e.target === settingsModal) settingsModal.classList.add("hidden");
 });
@@ -147,6 +152,8 @@ async function sendMessage(message) {
 
     addMessage("user", message);
     chatInput.value = "";
+    sendBtn.disabled = true;
+    sendBtn.textContent = "…";
 
     try {
         const response = await fetch("/api/chat", {
@@ -163,6 +170,10 @@ async function sendMessage(message) {
     } catch (error) {
         console.error(error);
         addMessage("nova", "Sorry, I couldn't reach the backend.");
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "↑";
+        chatInput.focus();
     }
 }
 
@@ -172,6 +183,10 @@ chatInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         sendMessage(chatInput.value);
     }
+});
+
+document.querySelectorAll(".suggestion").forEach((button) => {
+    button.addEventListener("click", () => sendMessage(button.dataset.message));
 });
 
 
