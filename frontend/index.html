@@ -1,199 +1,425 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#090b1d">
-    <title>NOVA · Personal AI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOVA AI · Offline</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-    <main class="app-shell">
-        <section class="home-panel" id="homeScreen" aria-labelledby="novaTitle">
-            <div class="top-bar">
-                <div class="brand-mark" aria-label="NOVA"><span></span><span></span><span></span></div>
-                <div class="connection-pill"><i></i><span id="status">Connecting...</span></div>
+
+    <!-- ─── HEADER ─── -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">N</div>
+                <span>NOVA</span>
             </div>
-
-<<<<<<< Updated upstream
-            <div class="hero-content">
-                <div class="nova-orb" aria-hidden="true">
-                    <div class="orb-ring ring-one"></div>
-                    <div class="orb-ring ring-two"></div>
-                    <div class="orb-core"><span>✦</span></div>
-                </div>
-                <p class="eyebrow">YOUR DESKTOP COPILOT</p>
-                <h1 id="novaTitle">Meet <span>NOVA.</span></h1>
-                <p class="subtitle">A calm, capable assistant for ideas, answers, and the little things you need done.</p>
-            </div>
-
-            <div class="action-grid">
-                <button id="chatBtn" class="action-card action-primary">
-                    <span class="action-icon">✦</span>
-                    <span class="action-copy"><strong>Start a conversation</strong><small>Ask NOVA anything</small></span>
-                    <span class="action-arrow">↗</span>
-                </button>
-                <button id="settingsBtn" class="action-card action-secondary">
-                    <span class="action-icon">⚙</span>
-                    <span class="action-copy"><strong>Preferences</strong><small>Personalize your experience</small></span>
-                    <span class="action-arrow">↗</span>
-                </button>
-            </div>
-
-            <div class="wake-card">
-                <div class="wake-card-icon">⌁</div>
-                <div class="wake-card-copy">
-                    <strong>Hands-free mode</strong>
-                    <span id="wakeWordLabel">Enable wake word</span>
-                </div>
-                <label class="switch" title="Enable wake word">
-                    <input type="checkbox" id="wakeWordToggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <p class="home-footer">NOVA is ready when you are <span>·</span> v0.4</p>
-        </section>
-
-        <section class="chat-container hidden" id="chatScreen" aria-label="NOVA chat">
-            <header class="chat-header">
-                <div class="chat-identity">
-                    <div class="mini-orb">✦</div>
-                    <div><strong>NOVA</strong><span id="wakeIndicator" class="wake-indicator hidden">Listening for your wake word</span><span class="assistant-state">Personal AI assistant</span></div>
-                </div>
-                <div class="header-actions">
-                    <button id="debugToggleBtn" class="icon-btn small-btn" title="Show debug log" aria-label="Show debug log">⌘</button>
-                    <button id="backBtn" class="icon-btn close-btn" title="Back to home" aria-label="Back to home">×</button>
-                </div>
-            </header>
-
-            <div class="chat-log" id="chatLog" aria-live="polite"></div>
-            <div class="debug-log hidden" id="debugLog"></div>
-
-            <div class="suggestion-row" id="suggestionRow">
-                <button class="suggestion" data-message="What can you help me with?">What can you do?</button>
-                <button class="suggestion" data-message="Tell me a joke">Tell me a joke</button>
-                <button class="suggestion" data-message="What time is it?">What time is it?</button>
-            </div>
-=======
-    <div class="container" id="homeScreen">
-
-        <div class="logo">
-            🤖
         </div>
 
-        <h1>NOVA</h1>
-
-        <p class="subtitle">
-            Your Personal AI Assistant
-        </p>
-
-        <div class="buttons">
-
-            <button id="chatBtn">
-                Start Chat
-            </button>
-
-            <button id="settingsBtn">
-                Settings
-            </button>
-
+        <div class="header-right">
+            <!-- Model Dropdown -->
+            <select id="modelSelect" class="model-select" title="Switch AI model">
+                <option value="">Loading models…</option>
+            </select>
+            <button id="refreshModels" title="Refresh model list" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:18px;">⟳</button>
+            <span id="modelLoader" style="display:none; color:var(--accent); font-size:14px;">⏳</span>
+            <span class="offline-badge" id="modelBadge" title="Click for model info">⚡ Offline</span>
+            <button class="history-btn" id="historyToggle" title="History">📜</button>
+            <button class="header-btn" title="Theme">🌙</button>
+            <button class="header-btn" title="Settings">⚙</button>
+            <div class="avatar">K</div>
         </div>
+    </header>
 
-        <div class="wake-toggle-row">
-            <label class="switch">
-                <input type="checkbox" id="wakeWordToggle">
-                <span class="slider"></span>
-            </label>
-            <span id="wakeWordLabel">Enable wake word</span>
-        </div>
+    <!-- ─── MAIN ─── -->
+    <main class="main">
 
-        <div class="status">
-
-            Status :
-            <span id="status">
-                🟢 Online
-            </span>
-
-        </div>
->>>>>>> Stashed changes
-
-            <div class="chat-input-row">
-                <button id="micBtn" class="icon-btn mic-btn" title="Speak to NOVA" aria-label="Speak to NOVA">⌁</button>
-                <div class="message-field">
-                    <input type="text" id="chatInput" placeholder="Message NOVA..." autocomplete="off">
-                    <span class="input-hint">Enter ↵</span>
-                </div>
-                <button id="sendBtn" class="icon-btn send-btn" title="Send message" aria-label="Send message">↑</button>
+        <!-- History Panel -->
+        <div class="history-panel" id="historyPanel">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-weight:600;">Conversation History</span>
+                <button id="clearHistoryBtn" style="background:transparent; border:none; color:var(--text-light); cursor:pointer; font-size:12px;">Clear</button>
             </div>
-        </section>
+            <div id="historyList"></div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <div class="hero" id="heroArea">
+                <h1>What can I help with?</h1>
+                <p class="subtitle">Ask me anything — code, writing, research, or just chat</p>
+            </div>
+            <div class="messages" id="messagesArea" style="display: none;"></div>
+        </div>
+
+        <!-- Composer -->
+        <div class="composer-wrapper">
+            <div class="composer">
+                <textarea placeholder="Message NOVA..." rows="1" id="chatInput"></textarea>
+                <div class="composer-bottom">
+                    <div class="composer-tools">
+                        <button title="Attach file">📎</button>
+                        <button title="Search">🔍</button>
+                    </div>
+                    <div class="composer-right">
+                        <span class="model-badge">NOVA 2.0</span>
+                        <button class="send-btn" id="sendBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13" />
+                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <p class="disclaimer">NOVA can make mistakes. Check important info.</p>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="suggestions" id="suggestions">
+            <button class="suggestion-btn" data-prompt="Explain quantum computing in simple terms"><span>💡</span> Quantum computing</button>
+            <button class="suggestion-btn" data-prompt="Write a Python script to scrape a website"><span>📝</span> Python script</button>
+            <button class="suggestion-btn" data-prompt="Give me ideas for a logo design"><span>🎨</span> Logo ideas</button>
+            <button class="suggestion-btn" data-prompt="Help me analyze this data: [paste your data]"><span>📊</span> Analyze data</button>
+        </div>
+
     </main>
 
-<<<<<<< Updated upstream
-    <div class="modal-overlay hidden" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-        <div class="modal-box">
-            <div class="modal-icon">⚙</div>
-            <button id="closeSettingsIconBtn" class="modal-close" title="Close settings" aria-label="Close settings">×</button>
-            <p class="eyebrow">PERSONALIZATION</p>
-            <h2 id="settingsTitle">Make NOVA yours</h2>
-            <p class="modal-description">Choose the phrase that gets NOVA's attention when hands-free mode is on.</p>
-
-            <label for="wakeWordInput">Wake word</label>
-            <input type="text" id="wakeWordInput" placeholder="e.g. Hey NOVA" maxlength="40">
-            <p class="modal-hint">Keep it short and easy to say for the best recognition.</p>
-
-            <div class="modal-actions">
-                <button id="closeSettingsBtn" class="secondary-btn">Cancel</button>
-                <button id="saveSettingsBtn" class="save-btn">Save changes</button>
-            </div>
-        </div>
-    </div>
-=======
-    <div class="chat-container hidden" id="chatScreen">
-
-        <div class="chat-header">
-            <span>🤖 NOVA</span>
-            <span id="wakeIndicator" class="wake-indicator hidden">👂 Listening for "Hey NOVA"...</span>
-            <button id="debugToggleBtn" class="icon-btn small-btn" title="Debug log">🐞</button>
-            <button id="backBtn" class="icon-btn" title="Back">✕</button>
-        </div>
-
-        <div class="chat-log" id="chatLog"></div>
-
-        <div class="debug-log hidden" id="debugLog"></div>
-
-        <div class="chat-input-row">
-            <button id="micBtn" class="icon-btn" title="Speak">🎤</button>
-            <input type="text" id="chatInput" placeholder="Type or say something..." autocomplete="off">
-            <button id="sendBtn" class="icon-btn send-btn" title="Send">➤</button>
-        </div>
-
-    </div>
-
-    <div class="modal-overlay hidden" id="settingsModal">
-        <div class="modal-box">
-            <h3>Settings</h3>
-
-            <label for="wakeWordInput">Wake word phrase</label>
-            <input type="text" id="wakeWordInput" placeholder="e.g. Hey NOVA">
-            <p class="modal-hint">Say this phrase to wake NOVA up hands-free.</p>
-
-            <div class="modal-actions">
-                <button id="closeSettingsBtn" class="secondary-btn">Cancel</button>
-                <button id="saveSettingsBtn">Save</button>
-            </div>
+    <!-- ─── INFO MODAL ─── -->
+    <div class="info-modal" id="infoModal">
+        <div class="info-modal-content">
+            <h2>🧠 About your model</h2>
+            <p><strong>Current model:</strong> <code id="currentModelDisplay">Qwen3-1.7B-Q4_K_M.gguf</code></p>
+            <p><strong>Location:</strong> <code>models/</code></p>
+            <hr style="border-color: var(--border); margin: 16px 0;" />
+            <h3>➕ Add your own model</h3>
+            <ol style="padding-left: 20px; line-height: 1.7;">
+                <li>Download any GGUF model from Hugging Face.</li>
+                <li>Place it inside the <code>models/</code> folder.</li>
+                <li>Click the ⟳ button above – NOVA will detect it instantly.</li>
+                <li>Select it from the dropdown and start chatting.</li>
+            </ol>
+            <p style="font-size: 13px; color: var(--text-light);">💡 <em>No restart, no config editing – just drop, refresh, and select.</em></p>
+            <button class="close-btn" id="closeInfoModal">Got it</button>
         </div>
     </div>
 
-    <script src="app.js"></script>
->>>>>>> Stashed changes
+    <script>
+        // ─── DOM refs ───
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const messagesArea = document.getElementById('messagesArea');
+        const heroArea = document.getElementById('heroArea');
+        const suggestions = document.getElementById('suggestions');
+        const statusBadge = document.getElementById('statusBadge');
+        const historyToggle = document.getElementById('historyToggle');
+        const historyPanel = document.getElementById('historyPanel');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const modelSelect = document.getElementById('modelSelect');
+        const modelLoader = document.getElementById('modelLoader');
+        const modelBadge = document.getElementById('modelBadge');
+        const infoModal = document.getElementById('infoModal');
+        const closeInfoModal = document.getElementById('closeInfoModal');
+        const currentModelDisplay = document.getElementById('currentModelDisplay');
+        const refreshModels = document.getElementById('refreshModels');
 
-    <script src="app.js"></script>
+        // ─── State ───
+        let lastUserMessage = '';
+        let lastAiMessageId = null; // ID of the AI message element to replace
+
+        // ─── Info modal toggle ───
+        modelBadge.addEventListener('click', () => infoModal.classList.add('open'));
+        closeInfoModal.addEventListener('click', () => infoModal.classList.remove('open'));
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) infoModal.classList.remove('open');
+        });
+
+        // ─── Auto-resize textarea ───
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        // ─── Send message ───
+        async function sendMessage(message, regenerate = false) {
+            if (!message.trim()) return;
+
+            if (!regenerate) {
+                // Normal send – hide hero and suggestions
+                heroArea.style.display = 'none';
+                suggestions.style.display = 'none';
+                messagesArea.style.display = 'block';
+            }
+
+            // Store for regeneration
+            lastUserMessage = message;
+
+            // Add user message (only if not regenerating)
+            if (!regenerate) {
+                addMessage('user', message);
+            }
+
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+
+            // Show loading indicator (replace last AI if regenerating)
+            let loadingId;
+            if (regenerate && lastAiMessageId) {
+                // Remove the last AI message and add a loading one in its place
+                const oldAi = document.getElementById(lastAiMessageId);
+                if (oldAi) oldAi.remove();
+                loadingId = addMessage('ai', '⏳ Thinking...', true);
+                lastAiMessageId = loadingId;
+            } else {
+                loadingId = addMessage('ai', '⏳ Thinking...', true);
+                lastAiMessageId = loadingId;
+            }
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                // Remove loading message
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+
+                // Add new AI message with regenerate button
+                const newId = addMessage('ai', data.reply, false, true);
+                lastAiMessageId = newId;
+
+            } catch (err) {
+                console.error('Chat error:', err);
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+                const errId = addMessage('ai', '❌ Sorry, I had trouble reaching the server. Make sure NOVA is running.', false, true);
+                lastAiMessageId = errId;
+            }
+        }
+
+        // ─── UI helpers ───
+        function addMessage(role, content, isLoading = false, withRegenerate = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message ${role}-message`;
+            if (isLoading) wrapper.id = 'loading-message';
+            if (!isLoading && role === 'ai') {
+                wrapper.id = 'ai-message-' + Date.now();
+            }
+
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${role === 'user' ? 'user-avatar' : 'nova-avatar'}`;
+            avatar.textContent = role === 'user' ? 'K' : 'N';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            const paragraphs = content.split('\n').filter(p => p.trim());
+            paragraphs.forEach(p => {
+                const pEl = document.createElement('p');
+                pEl.textContent = p;
+                contentDiv.appendChild(pEl);
+            });
+
+            wrapper.appendChild(role === 'user' ? contentDiv : avatar);
+            wrapper.appendChild(role === 'user' ? avatar : contentDiv);
+
+            // For AI messages, add action buttons
+            if (role === 'ai' && !isLoading) {
+                const actions = document.createElement('div');
+                actions.className = 'response-actions';
+                // Regenerate button
+                if (withRegenerate) {
+                    const regenBtn = document.createElement('button');
+                    regenBtn.textContent = '↻';
+                    regenBtn.title = 'Regenerate';
+                    regenBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        // Regenerate the last user message
+                        if (lastUserMessage) {
+                            sendMessage(lastUserMessage, true);
+                        }
+                    });
+                    actions.appendChild(regenBtn);
+                }
+                // Like, Share (placeholder)
+                ['♡', '⧉'].forEach(icon => {
+                    const btn = document.createElement('button');
+                    btn.textContent = icon;
+                    btn.addEventListener('click', (e) => e.stopPropagation());
+                    actions.appendChild(btn);
+                });
+                // Append actions after content
+                // The contentDiv is already appended, we need to append actions after that
+                // Since we appended contentDiv, we can append actions after it.
+                wrapper.appendChild(actions);
+            }
+
+            messagesArea.appendChild(wrapper);
+
+            requestAnimationFrame(() => {
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            });
+
+            return isLoading ? 'loading-message' : wrapper.id;
+        }
+
+        function removeMessage(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        // ─── History ───
+        async function loadHistory() {
+            try {
+                const res = await fetch('/api/history');
+                if (!res.ok) throw new Error('Failed to fetch history');
+                const data = await res.json();
+                const history = data.history || [];
+                historyList.innerHTML = '';
+                if (history.length === 0) {
+                    historyList.innerHTML = '<div style="color:var(--text-light); font-size:13px;">No conversations yet.</div>';
+                    return;
+                }
+                history.forEach(entry => {
+                    const div = document.createElement('div');
+                    div.className = 'history-entry';
+                    div.innerHTML = `
+                        <strong>You:</strong> ${entry.message}<br>
+                        <span style="color:var(--text-secondary);">NOVA:</span> ${entry.reply}
+                        <span class="timestamp">${new Date(entry.timestamp).toLocaleString()}</span>
+                    `;
+                    historyList.appendChild(div);
+                });
+            } catch (err) {
+                historyList.innerHTML = '<div style="color:var(--text-light);">Could not load history.</div>';
+            }
+        }
+
+        historyToggle.addEventListener('click', () => {
+            const isOpen = historyPanel.classList.toggle('open');
+            if (isOpen) loadHistory();
+        });
+
+        clearHistoryBtn.addEventListener('click', () => {
+            if (!confirm('Clear displayed messages? (Server memory is untouched)')) return;
+            messagesArea.innerHTML = '';
+            historyList.innerHTML = '<div style="color:var(--text-light);">History cleared locally.</div>';
+            if (messagesArea.children.length === 0) {
+                heroArea.style.display = 'block';
+                suggestions.style.display = 'flex';
+                messagesArea.style.display = 'none';
+            }
+            lastUserMessage = '';
+            lastAiMessageId = null;
+        });
+
+        // ─── Model Switcher ───
+        async function loadModelList() {
+            try {
+                const res = await fetch('/api/models');
+                const data = await res.json();
+                modelSelect.innerHTML = '';
+                if (data.models.length === 0) {
+                    modelSelect.innerHTML = '<option value="">No models found</option>';
+                    return;
+                }
+                data.models.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name.replace('.gguf', '');
+                    modelSelect.appendChild(opt);
+                });
+            } catch {
+                modelSelect.innerHTML = '<option value="">Error loading</option>';
+            }
+        }
+
+        refreshModels.addEventListener('click', function() {
+            loadModelList();
+            this.textContent = '✓';
+            setTimeout(() => { this.textContent = '⟳'; }, 1500);
+        });
+
+        modelSelect.addEventListener('change', async function() {
+            const filename = this.value;
+            if (!filename) return;
+            modelLoader.style.display = 'inline-block';
+            modelSelect.disabled = true;
+            try {
+                const res = await fetch('/api/switch-model', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const displayName = filename.replace('.gguf', '');
+                    modelBadge.textContent = `⚡ ${displayName}`;
+                    currentModelDisplay.textContent = filename;
+                    alert(`✅ Switched to ${displayName}`);
+                } else {
+                    alert(`❌ Failed: ${data.error}`);
+                }
+            } catch (err) {
+                alert('❌ Could not reach server.');
+            } finally {
+                modelLoader.style.display = 'none';
+                modelSelect.disabled = false;
+            }
+        });
+
+        // ─── Status ───
+        async function checkStatus() {
+            try {
+                const res = await fetch('/api/startup');
+                if (res.ok) {
+                    const data = await res.json();
+                    statusBadge.textContent = `● Online · ${data.version}`;
+                    statusBadge.style.color = '#4ade80';
+                } else {
+                    statusBadge.textContent = '● Offline';
+                    statusBadge.style.color = '#f87171';
+                }
+            } catch {
+                statusBadge.textContent = '● Offline';
+                statusBadge.style.color = '#f87171';
+            }
+        }
+
+        // ─── Init ───
+        loadModelList();
+        checkStatus();
+
+        // ─── Event listeners ───
+        sendBtn.addEventListener('click', () => sendMessage(chatInput.value));
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(chatInput.value);
+            }
+        });
+
+        document.querySelectorAll('.suggestion-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const prompt = this.dataset.prompt || this.textContent.trim();
+                chatInput.value = prompt;
+                chatInput.dispatchEvent(new Event('input'));
+                chatInput.focus();
+            });
+        });
+
+        chatInput.dispatchEvent(new Event('input'));
+    </script>
 </body>
-
 </html>

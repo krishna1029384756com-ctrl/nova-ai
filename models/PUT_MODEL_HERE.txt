@@ -1,0 +1,15 @@
+Download the model file and put it in this "models" folder.
+
+Direct download link (~1.1 GB):
+https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf
+
+After downloading, this folder should contain:
+  models/Qwen3-1.7B-Q4_K_M.gguf
+
+That exact filename must match LOCAL_MODEL_PATH in config.py. If you
+download a different quantization (e.g. Q5_K_M or Q8_0 for better quality,
+or a smaller one for more speed), update LOCAL_MODEL_PATH in config.py to
+match the new filename.
+
+Once the .gguf file is here and `pip install -r requirements.txt` has been
+run, delete this text file (or just leave it - NOVA ignores it).
