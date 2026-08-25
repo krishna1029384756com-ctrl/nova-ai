@@ -34,10 +34,24 @@ jobs:
         run: |
           python -m PyInstaller --clean --noconfirm installer/nova.spec
 
-      - name: Install WiX Toolset
+      - name: Download and verify NOVA model
+        shell: pwsh
+        run: |
+          $modelDir = Join-Path (Resolve-Path dist\NOVA).Path "models"
+          New-Item -ItemType Directory -Force -Path $modelDir | Out-Null
+          $model = Join-Path $modelDir "Qwen3-1.7B-Q4_K_M.gguf"
+          $url = "https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf?download=true"
+          $expected = "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5"
+          Invoke-WebRequest -Uri $url -OutFile $model
+          $actual = (Get-FileHash $model -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) { Remove-Item $model -Force; throw "Model SHA-256 verification failed." }
+          Write-Host "Bundled verified NOVA model: $model"
+
+      - name: Install WiX Toolset and UI extension
         shell: pwsh
         run: |
           dotnet tool install --global wix --version 7.0.0
+          wix extension add --global WixToolset.UI.wixext/7.0.0
           wix --version
 
       - name: Prepare version and MSI source
@@ -66,6 +80,7 @@ jobs:
             -dProjectDir=$projectDir `
             -dSourceDir=$sourceDir `
             -arch x64 `
+            -ext WixToolset.UI.wixext `
             -o "artifacts\NOVA-AI-$env:NOVA_VERSION-x64.msi"
 
       - name: Create portable ZIP
