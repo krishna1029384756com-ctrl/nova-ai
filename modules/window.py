@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 
 window = None
 canvas = None
@@ -6,18 +7,15 @@ emotion_label = None
 status_label = None
 message_label = None
 
-# Same palette as frontend/style.css, so the desktop window matches the web UI
 BG_OUTER = "#070B14"
 CARD_BG = "#121826"
 BORDER = "#1E293B"
 ACCENT = "#3B82F6"
 TEXT_PRIMARY = "#F8FAFC"
 TEXT_SECONDARY = "#94A3B8"
-
 FONT_TITLE = ("Segoe UI", 20, "bold")
 FONT_LABEL = ("Segoe UI", 11)
 FONT_MSG = ("Segoe UI", 10)
-
 WIDTH = 380
 HEIGHT = 260
 
@@ -30,11 +28,6 @@ def _rounded_rect(cv, x1, y1, x2, y2, r, **kwargs):
     ]
     return cv.create_polygon(points, smooth=True, **kwargs)
 
-
-# All update_* functions are safe to call from ANY thread (e.g. Flask's
-# request-handling thread). Tkinter widgets may only be touched from the
-# main thread, so we hop over to it via window.after(0, ...) instead of
-# touching the widgets directly.
 
 def update_emotion(text):
     if window and emotion_label:
@@ -49,6 +42,11 @@ def update_status(text):
 def update_message(text):
     if window and message_label:
         window.after(0, lambda: message_label.config(text=text))
+
+
+def notify(title, message):
+    if window:
+        window.after(0, lambda: messagebox.showinfo(title, message, parent=window))
 
 
 def hide():
@@ -79,23 +77,16 @@ def start(start_hidden=True):
 
     canvas = tk.Canvas(window, width=WIDTH, height=HEIGHT, bg=BG_OUTER, highlightthickness=0)
     canvas.pack(fill="both", expand=True)
-
-    # A rounded "card" behind everything, echoing the glassmorphism panels
-    # used in frontend/style.css (chat-container / modal-box).
     _rounded_rect(canvas, 14, 14, WIDTH - 14, HEIGHT - 14, 24, fill=CARD_BG, outline=BORDER, width=1)
 
     card = tk.Frame(canvas, bg=CARD_BG)
     canvas.create_window(WIDTH // 2, HEIGHT // 2, window=card, width=WIDTH - 70, height=HEIGHT - 50)
 
-    title = tk.Label(card, text="🤖  NOVA", font=FONT_TITLE, bg=CARD_BG, fg=TEXT_PRIMARY)
-    title.pack(pady=(4, 14))
-
+    tk.Label(card, text="🤖  NOVA", font=FONT_TITLE, bg=CARD_BG, fg=TEXT_PRIMARY).pack(pady=(4, 14))
     emotion_label = tk.Label(card, text="😊 Happy", font=FONT_LABEL, bg=CARD_BG, fg=ACCENT)
     emotion_label.pack(pady=2)
-
     status_label = tk.Label(card, text="Status: Starting...", font=FONT_LABEL, bg=CARD_BG, fg=TEXT_SECONDARY)
     status_label.pack(pady=2)
-
     message_label = tk.Label(
         card, text="Welcome to NOVA!", font=FONT_MSG, bg=CARD_BG, fg=TEXT_SECONDARY,
         wraplength=WIDTH - 110, justify="center"
@@ -104,5 +95,4 @@ def start(start_hidden=True):
 
     if start_hidden:
         window.withdraw()
-
     window.mainloop()
