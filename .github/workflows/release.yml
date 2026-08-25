@@ -1,0 +1,97 @@
+name: NOVA AI Windows Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install NOVA dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pyinstaller
+
+      - name: Build NOVA executable
+        shell: pwsh
+        run: |
+          python -m PyInstaller --clean --noconfirm installer/nova.spec
+
+      - name: Install WiX Toolset
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 7.0.0
+          wix --version
+
+      - name: Prepare version and MSI source
+        shell: pwsh
+        run: |
+          $version = "${env:GITHUB_REF_NAME}" -replace '^v', ''
+          if (-not $version -or $version -notmatch '^\d+\.\d+\.\d+$') {
+            $version = "0.0.1"
+          }
+          "NOVA_VERSION=$version" >> $env:GITHUB_ENV
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          New-Item -ItemType Directory -Force -Path build\installer | Out-Null
+          pwsh -File installer\Generate-AppFiles.ps1 `
+            -SourceDir (Resolve-Path dist\NOVA).Path `
+            -OutputFile (Join-Path (Resolve-Path build\installer).Path Generated-AppFiles.wxs
+
+      - name: Build MSI
+        shell: pwsh
+        run: |
+          $projectDir = (Resolve-Path .).Path
+          $sourceDir = (Resolve-Path dist\NOVA).Path
+          wix build `
+            installer\NOVA.wxs `
+            build\installer\Generated-AppFiles.wxs `
+            -dVersion=$env:NOVA_VERSION `
+            -dProjectDir=$projectDir `
+            -dSourceDir=$sourceDir `
+            -arch x64 `
+            -o "artifacts\NOVA-AI-$env:NOVA_VERSION-x64.msi"
+
+      - name: Create portable ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist\NOVA\* -DestinationPath "artifacts\NOVA-AI-$env:NOVA_VERSION-Portable.zip" -Force
+
+      - name: Create checksums
+        shell: pwsh
+        run: |
+          Get-ChildItem artifacts -File |
+            Get-FileHash -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash)  $($_.Path | Split-Path -Leaf)" } |
+            Set-Content artifacts\checksums.txt -Encoding ascii
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          if ($tag -notmatch '^v') { $tag = "v$env:NOVA_VERSION" }
+          gh release create $tag `
+            "artifacts\NOVA-AI-$env:NOVA_VERSION-x64.msi" `
+            "artifacts\NOVA-AI-$env:NOVA_VERSION-Portable.zip" `
+            "artifacts\checksums.txt" `
+            --title "NOVA AI $tag" `
+            --generate-notes
