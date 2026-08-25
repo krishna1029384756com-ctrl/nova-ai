@@ -15,7 +15,7 @@ NOVA is distributed as a normal Windows MSI through GitHub Releases.
 
 The installer puts the application in `Program Files` and keeps writable user data, memory, and the local AI model in the user's AppData folder so updates do not erase them.
 
-The local Qwen3 GGUF model is downloaded automatically on first use and verified before NOVA loads it. The model is distributed by the `ggml-org/Qwen3-1.7B-GGUF` project on Hugging Face and is listed there under the Apache-2.0 license. citeturn2search0
+The local Qwen3 GGUF model is downloaded automatically on first use and verified before NOVA loads it. The model is distributed by the `ggml-org/Qwen3-1.7B-GGUF` project on Hugging Face and is listed there under the Apache-2.0 license.
 
 ### Updating
 
