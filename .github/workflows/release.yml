@@ -51,9 +51,9 @@ jobs:
           "NOVA_VERSION=$version" >> $env:GITHUB_ENV
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
           New-Item -ItemType Directory -Force -Path build\installer | Out-Null
-          pwsh -File installer\Generate-AppFiles.ps1 `
-            -SourceDir (Resolve-Path dist\NOVA).Path `
-            -OutputFile (Join-Path (Resolve-Path build\installer).Path Generated-AppFiles.wxs
+          $source = (Resolve-Path dist\NOVA).Path
+          $generated = Join-Path (Resolve-Path build\installer).Path "Generated-AppFiles.wxs"
+          pwsh -File installer\Generate-AppFiles.ps1 -SourceDir $source -OutputFile $generated
 
       - name: Build MSI
         shell: pwsh
