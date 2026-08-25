@@ -1,45 +1,52 @@
-# NOVA configuration
+import os
+from pathlib import Path
+
+# --- Application data ---
+# Installed files live under Program Files, so writable user data belongs in AppData.
+APP_DATA_DIR = Path(os.getenv("APPDATA", Path.home())) / "NOVA AI"
+APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
+MODEL_DIR = APP_DATA_DIR / "models"
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- AI provider switch ---
-# "local"  = free, fully offline, runs INSIDE NOVA itself via llama.cpp - no
-#            separate app/service needed (unlike Ollama)
-# "grok"   = xAI's Grok, costs a small amount per message, needs an API key
-# "openai" = OpenAI, costs a small amount per message, needs an API key
-# "ollama" = free, runs on your PC, needs a separate Ollama app installed and running
+# "local"  = free, fully offline after the model is downloaded, runs inside NOVA
+# "grok"   = xAI's Grok, needs an API key
+# "openai" = OpenAI, needs an API key
+# "ollama" = free, runs on your PC, needs Ollama installed and running
 AI_PROVIDER = "local"
 
-# --- Local AI (llama.cpp, embedded directly - no external app) ---
-# 1. pip install -r requirements.txt   (installs llama-cpp-python)
-# 2. Download the model file (~1.1 GB) and save it at the path below:
-#    https://huggingface.co/unsloth/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf
-#    Put it in a "models" folder inside the novaAI project folder.
-LOCAL_MODEL_PATH = "models/Qwen3-1.7B-Q4_K_M.gguf"
-LOCAL_CONTEXT_SIZE = 4096     # how many tokens of context the model can see at once
-LOCAL_MAX_TOKENS = 200        # max length of a single reply
-LOCAL_THREADS = None          # None = let llama.cpp auto-detect CPU threads
+# --- Local AI (llama.cpp, embedded directly) ---
+# NOVA downloads this model automatically on first use into AppData.
+LOCAL_MODEL_FILENAME = "Qwen3-1.7B-Q4_K_M.gguf"
+LOCAL_MODEL_PATH = str(MODEL_DIR / LOCAL_MODEL_FILENAME)
+LOCAL_MODEL_URL = (
+    "https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF/resolve/main/"
+    "Qwen3-1.7B-Q4_K_M.gguf?download=true"
+)
+LOCAL_MODEL_SHA256 = "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5"
+LOCAL_CONTEXT_SIZE = 4096
+LOCAL_MAX_TOKENS = 200
+LOCAL_THREADS = None
 
-AI_HISTORY_LENGTH = 6        # how many past exchanges to give the AI as context
+AI_HISTORY_LENGTH = 6
+
+# --- Updates ---
+GITHUB_REPOSITORY = "krishna1029384756com-ctrl/nova-ai"
+UPDATE_CHECK_URL = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/releases/latest"
 
 # --- Grok (xAI) ---
-# Get a key from https://console.x.ai/team/default/api-keys (needs billing/credits set up).
-# NEVER share this file or upload it publicly once a real key is pasted in.
-GROK_API_KEY = ""            # paste your key between the quotes, e.g. "xai-..."
-GROK_MODEL = "grok-4.5"      # xAI's current flagship model as of Aug 2026
+GROK_API_KEY = ""
+GROK_MODEL = "grok-4.5"
 GROK_URL = "https://api.x.ai/v1/chat/completions"
 GROK_TIMEOUT = 30
 
 # --- Local AI (Ollama) ---
-# Ollama must be installed and running separately: https://ollama.com
-# After installing, pull a model once from a terminal, e.g.:
-#   ollama pull llama3.2
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "gemma3:1b"
-OLLAMA_TIMEOUT = 30          # seconds to wait for a reply before giving up
+OLLAMA_TIMEOUT = 30
 
 # --- OpenAI API ---
-# Get a key from https://platform.openai.com/api-keys (needs billing set up).
-# NEVER share this file or upload it publicly once a real key is pasted in.
-OPENAI_API_KEY = ""          # paste your key between the quotes, e.g. "sk-..."
+OPENAI_API_KEY = ""
 OPENAI_MODEL = "gpt-4o-mini"
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 OPENAI_TIMEOUT = 30
