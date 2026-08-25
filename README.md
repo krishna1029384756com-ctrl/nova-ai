@@ -2,6 +2,27 @@
 
 > **NOVA AI** is a personal AI assistant project focused on building a lightweight, modular, and customizable AI system for desktop use.
 
+## 📦 Installation
+
+### Windows
+
+NOVA is distributed as a normal Windows MSI through GitHub Releases.
+
+1. Open the **Releases** page.
+2. Open the latest stable release.
+3. Under **Assets**, download `NOVA-AI-<version>-x64.msi`.
+4. Run the MSI and install NOVA.
+
+The installer puts the application in `Program Files` and keeps writable user data, memory, and the local AI model in the user's AppData folder so updates do not erase them.
+
+The local Qwen3 GGUF model is downloaded automatically on first use and verified before NOVA loads it. The model is distributed by the `ggml-org/Qwen3-1.7B-GGUF` project on Hugging Face and is listed there under the Apache-2.0 license. citeturn2search0
+
+### Updating
+
+NOVA can check for a newer GitHub Release from its system-tray menu. When an update is available, NOVA downloads the new MSI and starts Windows Installer. Your AppData memory and model remain in place, so an application update does not require setting NOVA up from scratch.
+
+---
+
 ## 🌌 About NOVA
 
 NOVA is a personal AI assistant being developed with a simple goal:
