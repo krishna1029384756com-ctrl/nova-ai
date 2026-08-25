@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -46,7 +45,7 @@ jobs:
         run: |
           $version = "${env:GITHUB_REF_NAME}" -replace '^v', ''
           if (-not $version -or $version -notmatch '^\d+\.\d+\.\d+$') {
-            $version = "0.0.1"
+            throw "Release tags must use semantic versioning, for example v0.3.0"
           }
           "NOVA_VERSION=$version" >> $env:GITHUB_ENV
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
@@ -87,11 +86,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $tag = $env:GITHUB_REF_NAME
-          if ($tag -notmatch '^v') { $tag = "v$env:NOVA_VERSION" }
-          gh release create $tag `
+          gh release create $env:GITHUB_REF_NAME `
             "artifacts\NOVA-AI-$env:NOVA_VERSION-x64.msi" `
             "artifacts\NOVA-AI-$env:NOVA_VERSION-Portable.zip" `
             "artifacts\checksums.txt" `
-            --title "NOVA AI $tag" `
+            --title "NOVA AI $env:GITHUB_REF_NAME" `
             --generate-notes
