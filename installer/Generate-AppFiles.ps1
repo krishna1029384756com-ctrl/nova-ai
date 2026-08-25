@@ -66,7 +66,7 @@ foreach ($file in $files) {
         <File Id="$fileId" Source="$(Escape-Xml $sourcePath)" KeyPath="yes" />
       </Component>
 "@)
-    $refs.Add("      <ComponentRef Id=\"$componentId\" />")
+    $refs.Add(('      <ComponentRef Id="{0}" />' -f $componentId))
 }
 
 function Build-DirectoryTree([string]$ParentRelative, [int]$Indent) {
@@ -89,10 +89,11 @@ function Build-DirectoryTree([string]$ParentRelative, [int]$Indent) {
         $name = if ($ParentRelative) { $child.Substring($parentPrefix.Length) } else { $child }
         $id = $directories[$child]
         $pad = " " * $Indent
-        $lines.Add("${pad}<Directory Id=\"$id\" Name=\"$(Escape-Xml $name)\">")
+        $safeName = Escape-Xml $name
+        $lines.Add(('{0}<Directory Id="{1}" Name="{2}">' -f $pad, $id, $safeName))
         $nested = Build-DirectoryTree $child ($Indent + 2)
         if ($nested) { $lines.AddRange($nested) }
-        $lines.Add("${pad}</Directory>")
+        $lines.Add(('{0}</Directory>' -f $pad))
     }
     return $lines
 }
