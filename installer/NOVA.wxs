@@ -27,23 +27,13 @@
     </Feature>
 
     <Component Id="StartMenuShortcut" Directory="ApplicationProgramsFolder" Guid="*">
-      <Shortcut
-        Id="NOVAStartMenuShortcut"
-        Name="NOVA AI"
-        Description="Launch NOVA AI"
-        Target="[INSTALLFOLDER]NOVA.exe"
-        WorkingDirectory="INSTALLFOLDER" />
+      <Shortcut Id="NOVAStartMenuShortcut" Name="NOVA AI" Description="Launch NOVA AI" Target="[INSTALLFOLDER]NOVA.exe" WorkingDirectory="INSTALLFOLDER" />
       <RemoveFolder Id="RemoveNOVAStartMenuFolder" On="uninstall" />
       <RegistryValue Root="HKCU" Key="Software\NOVA AI" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
     </Component>
 
     <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="*">
-      <Shortcut
-        Id="NOVADesktopShortcut"
-        Name="NOVA AI"
-        Description="Launch NOVA AI"
-        Target="[INSTALLFOLDER]NOVA.exe"
-        WorkingDirectory="INSTALLFOLDER" />
+      <Shortcut Id="NOVADesktopShortcut" Name="NOVA AI" Description="Launch NOVA AI" Target="[INSTALLFOLDER]NOVA.exe" WorkingDirectory="INSTALLFOLDER" />
       <RegistryValue Root="HKCU" Key="Software\NOVA AI" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
     </Component>
   </Package>
