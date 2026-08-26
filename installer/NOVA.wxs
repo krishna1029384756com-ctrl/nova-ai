@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package
+    Name="NOVA AI"
+    Manufacturer="Krishna Agrawal"
+    Version="$(var.Version)"
+    UpgradeCode="5F658BFE-14C6-4E3B-A3E4-89AA87FB0E94"
+    Scope="perMachine">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of NOVA AI is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="NOVA AI" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="NOVA AI" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <Feature Id="MainFeature" Title="NOVA AI" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+    <Component Id="StartMenuShortcut" Directory="ApplicationProgramsFolder" Guid="*">
+      <Shortcut Id="NOVAStartMenuShortcut" Name="NOVA AI" Description="Launch NOVA AI" Target="[INSTALLFOLDER]NOVA.exe" WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="RemoveNOVAStartMenuFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software\NOVA AI" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="*">
+      <Shortcut Id="NOVADesktopShortcut" Name="NOVA AI" Description="Launch NOVA AI" Target="[INSTALLFOLDER]NOVA.exe" WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\NOVA AI" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+  </Package>
+</Wix>

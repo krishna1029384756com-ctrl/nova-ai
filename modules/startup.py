@@ -9,13 +9,9 @@ import threading
 import time
 
 from modules.server import create_server
-from modules import tray
-from modules import window
-
-from internet import (
-    check_internet,
-    get_internet_status
-)
+from modules import tray, window
+from modules.version import __version__
+from internet import check_internet, get_internet_status
 
 
 # ============================================================
@@ -51,10 +47,7 @@ def restart_function():
     print("========================================")
 
     for number, data in STARTUP_FUNCTIONS.items():
-
-        print(
-            f"{number}. {data['name']}"
-        )
+        print(f"{number}. {data['name']}")
 
     print("========================================")
 
@@ -63,38 +56,27 @@ def restart_function():
     ).strip()
 
     if not choice.isdigit():
-
-        print(
-            "NOVA: Invalid function number."
-        )
-
+        print("NOVA: Invalid function number.")
         return
 
     number = int(choice)
 
     if number not in STARTUP_FUNCTIONS:
-
-        print(
-            "NOVA: Function not found."
-        )
-
+        print("NOVA: Function not found.")
         return
 
     function_data = STARTUP_FUNCTIONS[number]
 
     print()
-
     print(
         f"NOVA: Restarting "
         f"{function_data['name']}..."
     )
 
     try:
-
         function_data["function"]()
 
         print()
-
         print(
             f"NOVA: "
             f"{function_data['name']} "
@@ -102,12 +84,8 @@ def restart_function():
         )
 
     except Exception as error:
-
         print()
-
-        print(
-            f"NOVA ERROR: {error}"
-        )
+        print(f"NOVA ERROR: {error}")
 
 
 # ============================================================
@@ -120,10 +98,7 @@ def restart_all():
     """
 
     print()
-
-    print(
-        "NOVA: Restarting complete startup..."
-    )
+    print("NOVA: Restarting complete startup...")
 
     time.sleep(0.5)
 
@@ -149,70 +124,33 @@ def startup_command_listener():
     """
 
     while True:
-
         try:
-
             command = input(
                 "NOVA > "
             ).strip().lower()
 
-            # ------------------------------------------------
-            # RESTART ONE FUNCTION
-            # ------------------------------------------------
-
             if command == "r":
-
                 restart_function()
 
-            # ------------------------------------------------
-            # RESTART EVERYTHING
-            # ------------------------------------------------
-
             elif command == "ra":
-
                 restart_all()
 
-            # ------------------------------------------------
-            # UNKNOWN COMMAND
-            # ------------------------------------------------
-
             else:
-
-                print(
-                    "NOVA: Unknown command."
-                )
-
-                print(
-                    "NOVA: Use:"
-                )
-
-                print(
-                    "  r  = restart one function"
-                )
-
-                print(
-                    "  ra = restart entire startup"
-                )
+                print("NOVA: Unknown command.")
+                print("NOVA: Use:")
+                print("  r  = restart one function")
+                print("  ra = restart entire startup")
 
         except KeyboardInterrupt:
-
             print()
-
-            print(
-                "NOVA: Command listener stopped."
-            )
-
+            print("NOVA: Command listener stopped.")
             break
 
         except EOFError:
-
             break
 
         except Exception as error:
-
-            print(
-                f"NOVA CONTROL ERROR: {error}"
-            )
+            print(f"NOVA CONTROL ERROR: {error}")
 
 
 # ============================================================
@@ -220,10 +158,7 @@ def startup_command_listener():
 # ============================================================
 
 def load_settings():
-
-    print(
-        "[1/6] Loading Settings..."
-    )
+    print("[1/6] Loading Settings...")
 
 
 # ============================================================
@@ -231,10 +166,7 @@ def load_settings():
 # ============================================================
 
 def load_memory():
-
-    print(
-        "[2/6] Loading Memory..."
-    )
+    print("[2/6] Loading Memory...")
 
 
 # ============================================================
@@ -242,10 +174,7 @@ def load_memory():
 # ============================================================
 
 def load_brain():
-
-    print(
-        "[3/6] Loading Brain..."
-    )
+    print("[3/6] Loading Brain...")
 
 
 # ============================================================
@@ -253,44 +182,21 @@ def load_brain():
 # ============================================================
 
 def load_internet():
-
-    print(
-        "[4/6] Loading Internet..."
-    )
-
-    print(
-        "      Checking real internet connection..."
-    )
+    print("[4/6] Loading Internet...")
+    print("      Checking real internet connection...")
 
     try:
-
         online = check_internet()
 
         if online:
-
-            print(
-                "      🌐 Internet connection detected."
-            )
-
-            print(
-                "      Status: ONLINE"
-            )
-
+            print("      🌐 Internet connection detected.")
+            print("      Status: ONLINE")
         else:
-
-            print(
-                "      ⚠️ Internet connection unavailable."
-            )
-
-            print(
-                "      Status: OFFLINE"
-            )
+            print("      ⚠️ Internet connection unavailable.")
+            print("      Status: OFFLINE")
 
     except Exception as error:
-
-        print(
-            f"      NOVA INTERNET ERROR: {error}"
-        )
+        print(f"      NOVA INTERNET ERROR: {error}")
 
 
 # ============================================================
@@ -298,10 +204,7 @@ def load_internet():
 # ============================================================
 
 def load_website():
-
-    print(
-        "[5/6] Loading Website..."
-    )
+    print("[5/6] Loading Website...")
 
 
 # ============================================================
@@ -309,13 +212,9 @@ def load_website():
 # ============================================================
 
 def load_server():
-
-    print(
-        "[6/6] Starting Server..."
-    )
+    print("[6/6] Starting Server...")
 
     try:
-
         app = create_server()
 
         # ----------------------------------------------------
@@ -334,9 +233,7 @@ def load_server():
 
         server_thread.start()
 
-        print(
-            "      Flask server started."
-        )
+        print("      Flask server started.")
 
         # ----------------------------------------------------
         # SYSTEM TRAY
@@ -349,26 +246,19 @@ def load_server():
 
         tray_thread.start()
 
-        print(
-            "      System tray started."
-        )
+        print("      System tray started.")
 
         # ----------------------------------------------------
         # WINDOW STATUS
         # ----------------------------------------------------
 
         def mark_online():
-
             time.sleep(0.5)
 
             try:
-
-                window.update_status(
-                    "Online"
-                )
+                window.update_status("Online")
 
             except Exception as error:
-
                 print(
                     f"NOVA WINDOW ERROR: {error}"
                 )
@@ -379,10 +269,7 @@ def load_server():
         ).start()
 
     except Exception as error:
-
-        print(
-            f"NOVA SERVER ERROR: {error}"
-        )
+        print(f"NOVA SERVER ERROR: {error}")
 
 
 # ============================================================
@@ -433,23 +320,11 @@ register_function(
 def start_nova():
 
     print()
+    print("=" * 50)
+    print("           NOVA AI")
+    print("=" * 50)
 
-    print(
-        "=" * 50
-    )
-
-    print(
-        "           NOVA AI"
-    )
-
-    print(
-        "=" * 50
-    )
-
-    print(
-        "NOVA: Starting..."
-    )
-
+    print("NOVA: Starting...")
     print()
 
     # ========================================================
@@ -457,15 +332,10 @@ def start_nova():
     # ========================================================
 
     load_settings()
-
     load_memory()
-
     load_brain()
-
     load_internet()
-
     load_website()
-
     load_server()
 
     # ========================================================
@@ -473,46 +343,17 @@ def start_nova():
     # ========================================================
 
     print()
-
-    print(
-        "========================================"
-    )
-
-    print(
-        "NOVA Backend is Online"
-    )
-
-    print(
-        "Version : 0.3"
-    )
-
-    print(
-        f"Internet: {get_internet_status()}"
-    )
-
-    print(
-        "Running in the background."
-    )
-
-    print(
-        "========================================"
-    )
-
+    print("========================================")
+    print("NOVA Backend is Online")
+    print(f"Version : {__version__}")
+    print(f"Internet: {get_internet_status()}")
+    print("Running in the background.")
+    print("========================================")
     print()
 
-    print(
-        "NOVA startup controls:"
-    )
-
-    print(
-        "r  = restart one selected function"
-    )
-
-    print(
-        "ra = restart entire startup"
-    )
-
-    print()
+    print("NOVA startup controls:")
+    print("r  = restart one selected function")
+    print("ra = restart entire startup")
 
     # ========================================================
     # COMMAND LISTENER
@@ -539,5 +380,4 @@ def start_nova():
 # ============================================================
 
 if __name__ == "__main__":
-
     start_nova()

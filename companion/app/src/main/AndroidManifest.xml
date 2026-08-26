@@ -9,6 +9,7 @@
         android:label="NOVA Companion"
         android:supportsRtl="true"
         android:theme="@style/Theme.NOVACompanion">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -17,5 +18,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 </manifest>
