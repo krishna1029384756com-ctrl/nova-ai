@@ -1,25 +1,48 @@
-"""Simple web search helper for NOVA."""
-import requests
+from duckduckgo_search import DDGS
 
 
 def web_search(query, max_results=5):
-    url = "https://html.duckduckgo.com/html/"
+    """
+    Search the web and return search results.
+    """
+
+    results = []
+
     try:
-        response = requests.get(url, params={"q": query}, timeout=10, headers={"User-Agent": "NOVA-AI/1.0"})
-        response.raise_for_status()
-        from bs4 import BeautifulSoup
-        soup = BeautifulSoup(response.text, "html.parser")
-        results = []
-        for item in soup.select(".result")[:max_results]:
-            link = item.select_one(".result__a")
-            snippet = item.select_one(".result__snippet")
-            if link:
-                results.append({"title": link.get_text(" ", strip=True), "url": link.get("href"), "snippet": snippet.get_text(" ", strip=True) if snippet else ""})
-        return results
-    except Exception:
-        return []
+        with DDGS() as ddgs:
+            search_results = ddgs.text(
+                query,
+                max_results=max_results
+            )
+
+            for result in search_results:
+                results.append({
+                    "title": result.get("title", ""),
+                    "url": result.get("href", ""),
+                    "description": result.get("body", "")
+                })
+
+    except Exception as error:
+        print(f"NOVA WEB ERROR: {error}")
+
+    return results
 
 
 def display_results(results):
-    for index, result in enumerate(results, 1):
-        print(f"{index}. {result['title']}\n   {result['url']}\n   {result['snippet']}")
+
+    if not results:
+        print("NOVA: No search results found.")
+        return
+
+    print()
+    print("========================================")
+    print("          NOVA WEB RESULTS")
+    print("========================================")
+
+    for number, result in enumerate(results, start=1):
+
+        print(f"\n[{number}] {result['title']}")
+        print(f"URL: {result['url']}")
+        print(f"{result['description']}")
+
+    print("\n========================================")

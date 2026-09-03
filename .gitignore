@@ -1,2 +1,8 @@
 models/Qwen3-1.7B-Q4_K_M.gguf
-__pycache__
+
+__pycache__/
+
+zip_fast.py
+
+tast_llm.py
+nova-code-only.zip
