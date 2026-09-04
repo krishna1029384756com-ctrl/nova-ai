@@ -1,10 +1,11 @@
-import threading
 import os
+import threading
 
 from flask import jsonify
 from flask import send_from_directory
 from flask import request
 
+import config
 from modules.brain import brain
 from modules import memory
 from modules import voice
@@ -63,7 +64,7 @@ def register_routes(app):
 
     @app.route("/api/chat", methods=["POST"])
     def chat():
-        data = request.get_json()
+        data = request.get_json() or {}
         message = data.get("message", "")
         reply = brain.chat(message)
 
@@ -112,35 +113,30 @@ def register_routes(app):
         return jsonify({"ok": True})
 
     # =========================
-    # NEW: List available models
+    # Model API
     # =========================
 
     @app.route("/api/models")
     def list_models():
-        models_dir = os.path.join(os.path.dirname(__file__), "..", "models")
+        models_dir = config.MODEL_DIR
         try:
-            files = [f for f in os.listdir(models_dir) if f.endswith(".gguf")]
+            files = [f.name for f in models_dir.iterdir() if f.is_file() and f.suffix.lower() == ".gguf"]
             return jsonify({"models": sorted(files)})
         except FileNotFoundError:
             return jsonify({"models": []})
 
-    # =========================
-    # NEW: Switch to a different model
-    # =========================
-
     @app.route("/api/switch-model", methods=["POST"])
     def switch_model():
-        data = request.get_json()
-        filename = data.get("filename")
+        data = request.get_json(silent=True) or {}
+        filename = data.get("filename", "")
 
-        if not filename or not filename.endswith(".gguf"):
+        if not filename or os.path.basename(filename) != filename or not filename.lower().endswith(".gguf"):
             return jsonify({"error": "Invalid model filename"}), 400
 
-        model_path = os.path.join(os.path.dirname(__file__), "..", "models", filename)
+        model_path = config.MODEL_DIR / filename
 
         try:
-            from modules import ai
-            ai.switch_local_model(model_path)
+            ai.switch_local_model(str(model_path))
             return jsonify({"success": True, "message": f"Switched to {filename}"})
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
+        except Exception as error:
+            return jsonify({"error": str(error)}), 500

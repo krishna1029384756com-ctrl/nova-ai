@@ -90,8 +90,8 @@ jobs:
       - name: Install WiX Toolset and UI extension
         shell: pwsh
         run: |
-          dotnet tool install --global wix --version 7.0.0
-          wix extension add --global WixToolset.UI.wixext/7.0.0
+          dotnet tool install --global wix --version 6.0.2
+          wix extension add --global WixToolset.UI.wixext/6.0.2
           wix --version
 
       - name: Prepare MSI source
