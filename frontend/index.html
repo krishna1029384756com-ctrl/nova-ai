@@ -325,29 +325,58 @@
 
         // ─── Model Switcher ───
         async function loadModelList() {
+            const previousSelection = modelSelect.value;
             try {
-                const res = await fetch('/api/models');
+                const res = await fetch('/api/models', { cache: 'no-store' });
+                if (!res.ok) throw new Error(`Model scan failed (HTTP ${res.status})`);
+
                 const data = await res.json();
+                if (!data || !Array.isArray(data.models)) {
+                    throw new Error('Invalid model list response');
+                }
+
                 modelSelect.innerHTML = '';
                 if (data.models.length === 0) {
-                    modelSelect.innerHTML = '<option value="">No models found</option>';
-                    return;
+                    modelSelect.innerHTML = '<option value="">No GGUF models found</option>';
+                    return true;
                 }
+
                 data.models.forEach(name => {
                     const opt = document.createElement('option');
                     opt.value = name;
-                    opt.textContent = name.replace('.gguf', '');
+                    opt.textContent = name.replace(/\.gguf$/i, '');
                     modelSelect.appendChild(opt);
                 });
-            } catch {
-                modelSelect.innerHTML = '<option value="">Error loading</option>';
+
+                if (data.models.includes(previousSelection)) {
+                    modelSelect.value = previousSelection;
+                }
+                return true;
+            } catch (error) {
+                console.error('Could not refresh NOVA models:', error);
+                modelSelect.innerHTML = '<option value="">Error loading models</option>';
+                return false;
             }
         }
 
-        refreshModels.addEventListener('click', function() {
-            loadModelList();
-            this.textContent = '✓';
-            setTimeout(() => { this.textContent = '⟳'; }, 1500);
+        refreshModels.addEventListener('click', async function() {
+            const button = this;
+            const originalTitle = 'Refresh model list';
+            button.disabled = true;
+            button.textContent = '…';
+            button.title = 'Scanning model folders…';
+
+            const refreshed = await loadModelList();
+            button.disabled = false;
+            button.textContent = refreshed ? '✓' : '!';
+            button.title = refreshed
+                ? 'Model list refreshed'
+                : 'Could not refresh models. Check that NOVA is running.';
+
+            setTimeout(() => {
+                button.textContent = '⟳';
+                button.title = originalTitle;
+            }, 1800);
         });
 
         modelSelect.addEventListener('change', async function() {
