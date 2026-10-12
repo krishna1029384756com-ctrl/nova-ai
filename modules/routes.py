@@ -1,6 +1,8 @@
 import threading
 import os
 
+import config
+
 from flask import jsonify
 from flask import send_from_directory
 from flask import request
@@ -112,35 +114,71 @@ def register_routes(app):
         return jsonify({"ok": True})
 
     # =========================
-    # NEW: List available models
+    # List available local GGUF models
     # =========================
 
     @app.route("/api/models")
     def list_models():
-        models_dir = os.path.join(os.path.dirname(__file__), "..", "models")
-        try:
-            files = [f for f in os.listdir(models_dir) if f.endswith(".gguf")]
-            return jsonify({"models": sorted(files)})
-        except FileNotFoundError:
-            return jsonify({"models": []})
+        # Support both the repository's models/ folder and the writable
+        # AppData model directory configured for installed NOVA builds.
+        project_models_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "models")
+        )
+        configured_models_dir = os.path.abspath(str(config.MODEL_DIR))
+        models = set()
+
+        for models_dir in (project_models_dir, configured_models_dir):
+            try:
+                for filename in os.listdir(models_dir):
+                    full_path = os.path.join(models_dir, filename)
+                    if os.path.isfile(full_path) and filename.lower().endswith(".gguf"):
+                        models.add(filename)
+            except FileNotFoundError:
+                continue
+            except OSError:
+                continue
+
+        return jsonify({"models": sorted(models, key=str.casefold)})
 
     # =========================
-    # NEW: Switch to a different model
+    # Switch local GGUF model
     # =========================
 
     @app.route("/api/switch-model", methods=["POST"])
     def switch_model():
-        data = request.get_json()
-        filename = data.get("filename")
+        data = request.get_json(silent=True) or {}
+        filename = data.get("filename", "")
 
-        if not filename or not filename.endswith(".gguf"):
-            return jsonify({"error": "Invalid model filename"}), 400
+        # Accept only a plain GGUF filename, never a caller-supplied path.
+        if (
+            not isinstance(filename, str)
+            or not filename.lower().endswith(".gguf")
+            or filename in (".", "..")
+            or os.path.basename(filename) != filename
+        ):
+            return jsonify({"success": False, "error": "Invalid model filename"}), 400
 
-        model_path = os.path.join(os.path.dirname(__file__), "..", "models", filename)
+        project_models_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "models")
+        )
+        configured_models_dir = os.path.abspath(str(config.MODEL_DIR))
+        model_path = None
+
+        # Prefer models/ for files with duplicate names, then check AppData.
+        for models_dir in (project_models_dir, configured_models_dir):
+            candidate = os.path.join(models_dir, filename)
+            if os.path.isfile(candidate):
+                model_path = candidate
+                break
+
+        if model_path is None:
+            return jsonify({
+                "success": False,
+                "error": "That model was not found. Refresh the model list and try again."
+            }), 404
 
         try:
-            from modules import ai
             ai.switch_local_model(model_path)
             return jsonify({"success": True, "message": f"Switched to {filename}"})
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
+        except Exception as error:
+            return jsonify({"success": False, "error": str(error)}), 500
